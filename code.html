@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>Safari Website Homepage</title>
+  
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&amp;display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#ec7f13",
+            "background-light": "#f8f7f6",
+            "background-dark": "#181411",
+          },
+          fontFamily: {
+            "display": ["Plus Jakarta Sans", "sans-serif"]
+          },
+          borderRadius: { "DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px" },
+        },
+      },
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .material-symbols-outlined {
+      font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24;
+    }
+  </style>
+  
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/history@5/umd/history.development.js"></script>
+  <script src="https://unpkg.com/react-router@6.3.0/umd/react-router.development.js"></script>
+  <script src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+    const { createRoot } = ReactDOM;
+    const { MemoryRouter, Routes, Route, Link, useNavigate } = ReactRouterDOM;
+
+    // --- Data ---
+    const parkData = [
+      { name: 'Serengeti', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDibbY7gNdf1DTaSenEEzACKIjmcVnsgmlmvqMFGkeHy2w31plczlJb_NpBmSfrtGbYJ7jPSuusRX_1ewxTAuauMhAW06nTIgtAXYxH0iEk82Iv5jtWW-rtLFgMlPDG7qIDAR87ysVntGXi0JUMBBTzf2klplqh66hI6jqOEmm4zePIn85NDR2sPjDYMVss9sD0t3M3rkw5zdCWPDkb_zdvChuwvD7G1Z5InHoeWNABfCQqzJL4bHkMHa-_Xsfg6J8KlXAPwyxEkDU' },
+      { name: 'Ngorongoro', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAX5glFPTeBOIlTPX0HmcDRpL_4r6n66N6EpnWxZZVrusPwVzPZDAk124boxhn0QAEoNSO14IasMJvvkkKBll_nYiGAeGb65l665IdgOZGvnUuSOxpTsmc-Ts2UD-CIky0WERPmtAtFn4LJNFs8Spl2hAVa0TyBOJWMYlkqaJTbpA1ar1omoOkejPaujPBqipydG-NqVYwlbw_uS31j1fXxfUj7q6ZSkQd8mGU_DLBwYs_Ol_-B_Xf5sa6CDjgUsBkTI6GQv8-960E' },
+      { name: 'Tarangire', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBndYFgWbKeMjv_B_KZvoMvIpH4BEbUd8pu0MEF0geLfeQChROf4M--YS_TRYrLt8e7Q3UfinKP6GRq6ZjsOICtBVNka5YoEpz2PgwhGWUQVI3FW-B3DUL3ddkrhfRReJ1YwOII210xueGKtQyPcMVXiEJuWuiCqH4XCkLYVTYM1buuD9V3j2xzhrpbzjfCnJgWtMS9aqhyEDrxJ7ZFA5BbRvNFozRevzM6jdbAsmcjE2Fi_Ym9bHIehvtISVPnKGy0SzADjMbmVFc' },
+      { name: 'Lake Manyara', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCjPYfW50eYZEf8glVCvGOHtuCu8CLQEMZLpe4y56gxkh6pAin3Xu7X94BEppDXPomX0Y-w28xeA3DpGiMpeCXs6yqhGThExMV8ujjEI7j8BytG_jd5dAlIHe1f-RsyCj8gYj3Bhk87MwTlmGlx4Na8gEIm_t7BcaT6Na1d1hWg10f3yL5BBaIzj-LNBpER68p2TT0BHTYgv6xWODsLHBBhNG4BCaiXvWtHEC_Qv7ntpjuCpkBu7gslyQQR63hNFZgKc-UgqGjXJ0o' },
+      { name: 'Arusha', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDoZkVvud6-zojrJy6AMdMaPafphkPszO-9F_08z5yByngHUQoUNYCiTc3zI_I8NfGjcJrYEgD4eGHlvItYFrvjAfmRpqHL74qhWtCHVKsbliL37N8gKS4R9xZugfk-j4VuCMtPYFahqchgsGlUfa21metYSrMuFd9bBbbaSeMmCrH2meXkW5WVXHFbnrLC97WO4ZijpAc6NTpfh-cbd-newRDzEIBICCBu4Iqwq5ZA-rjhJGnwoVHi6DY2w5HuUCrgLN6WP1J4Kbc' },
+      { name: 'Ruaha', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDpuZ3bwgS1Yd31cVwekizJYDNUwMIgjCFFFnpuAUEqNCPl0UNaawocjMZvRK65_64WtQY4zDvwUbwEYg5sagJpPMAAen-N3LaiWfi-fvzmErJWmPsQsakKAr6LCP4YfJFjTqJMzdS9jJncmKWiHQKtnRoPTis9VQsLcblFjcwnEbQa1vJWtBcgbU-YzTcKRkX_mqA-ihKbiw-rIlEJJj9hvmnE2Vb04NiFwsbRFDwnpQua4t3vT5OQdN6UPuPI7r3tH9xolF_PHCc' },
+      { name: 'Gombe', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDop2gh5FtVR5AwieUQeSVJxTuWpk2pkVsiM3YRfSc1LkWXAc0GAgDeSnzIAt6PIsxckAPxU8CWdulhknmVvemdfZPWteJx22_8GWXxzKMrUVgp3iOCoTllUf2YLU4k0pK7ZTkre57eYEv8OHdagDNqvrEPuDl-V2GaD-lPS0OdO545HLh7YnPT64Ulx1CKF9dzHrYEU7jn8ti1NLxYP4NgNONEgLq2RMtCSOCIBmrX81V4o6yOEInKPQKtUKt0MvdAHiWUclEB5KY' },
+      { name: 'Katavi', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBeIbyRWcQ-_pKdlN9iLPp54psp-gvWnGWokVteXO67hk1rvBHnkc4Sl7zkEXENA2-NvCnAz6LqH6GVF_DEt6J2sCoDK1GGKxAgKXT2vSWnDG2ZBIyA5DJs_bYE6tDCPqXVqIwoo_lJPSNMSwP4b6ZLnoG45Bx5ViJlNEjRrHmqanRnA-qc1Q0tSsmCWsxTBR7rI0YE8SBY5oZCF7E4GNqJUwgyYe6QeIcZENQbOzefcWIjNloOLdhsCM4AODYt85xzI3Camr18d5w' },
+      { name: 'Nyerere (Selous)', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDnsgE1Pt7IGjMjZCMbto11jMuQkwvzGgJgsmPRVD1-fnW3MebyXkXM8rgyGLXQW8fAF5RUJZvbWCai9NRl2SpwVCLROzMk_xml_gDFZQ_JPvEv8-eAdETqLmMPqDVex88S0CF0nviBSfssz30gN4vU1iPz5Qq7-gbsfa33F3sSyPYjTpZuRrd-eIsIxJOWCAkriXWo18XYuPywmn8nqXohOvF44tir1nOUcWZIUqEg0vxw_uPuconAwBQjI-7YttLWaul2ltZTyvM' },
+      { name: 'Mahale Mountains', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBe-YT7POsGYZQz0VYXs9i3jQ159cjYboZzEF-JRGaZJl0QHExRGIgVpFYWnFZDL34u6kOv68IuePfKbdk1AbobytUZIJ9dIo2-l8UIAwyWhUeLtUSbpw9WGThGqSIbCm4KJJDC3morDzGcYcMfylNFwWBZQGgiw1aLDFgr5gZ2Oc97SOTnqdTOJ3P_rAALmBizhZ75DbKh2y-o4KU33WxeqSFFqWJYz8hM8C6mULHXscLO--3Z0YDgTErSV1tzCu8-aGO58tabj-g' }
+    ];
+
+    const packageData = [
+      { days: '6 Days', price: '$ 2890 pp', title: '6-Day Majestic Tanzania - Mid-Range', description: 'Explore the best of Tanzania in 6 days, visiting Tarangire, Lake Manyara, Serengeti, and Ngorongoro Crater. Enjoy breathtaking landscapes and abundant wildlife.', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCuWTqfcbRI99QpefMKPE6od-xnXPKtyezwXnat3NmFI0WQOsQIqAYZ_W0Wy3MBw-D8IGiGGxTM2sCPh2GCEUv6-B4ztZy5ZVfUDsY1VPesc0rfgz5VdvhI6DuX_BwiGUSHE3Sfkh76wvNDReK2mFU8Cew6RbKuAnpGtAjOgT1yXonmkE5Hb7LnqMuHPBkGdghLd8Od3ZeTgV-iA8GM4MmpvU78iw4HKAMLgN8Uzyn0VYQcM4vgYVV-dtI2WPft713IQ_eqtzhNj-8' },
+      { days: '5 Days', price: '$ 1950 pp', title: '5-Day Kilimanjaro Trek - Marangu Route', description: 'Conquer Africa\'s highest peak via the popular Marangu Route.', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBHTcM6jOSoEHVIzxiQd0DqUl9leYgwuZ2gEBX2fJ4fzHIAJqiytcF8LkZYRSZzJlxyEJgvDAJgnq2I7RXLNAw9byQGgqG_VF7aLQiypWhgRCWRo9qOno89LotztgVd8emEHgnU6m6f2qa-r_L4rNjIwBEKDe01KXfViKpZZLlvxHNO8H-12ERn0ANTGiz93ytwivlFm63l-zBKeMMqB73uQNmo22MCS5UVis1YJ19VnT1dS-gXlYxbPAMYC8oPZL8suLZlQhDp6UY' },
+      { days: '10 Days', price: '$ 4200 pp', title: '10-Day Epic Tanzania & Kenya Safari', description: 'Cross borders for the ultimate East African safari adventure.', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD3PdRg4z-bMFBekllxvtMp4R8kBPQlAvNXwoN5E4ONPsH7h_1XEAixCacIIbfgCq77lmQWCa320JQsGyYeykfB5xdqCa5yV1_ci32TA96e5gD3H2VuQ5SDAScfvVR-FJM3nWOqlBJyoigW4IgZCLM3Vt2U7bjdfiRajOEzqCNQwrgg0i5TJj-PijoyOPCJNgPJ8MtpYD9io-FiYam-1bQoljdKYxV93nJdGNRTBkQ5xw1ZwITNYhswovObo1iTPHzILYcE1Y6vr5Q' },
+      { days: '3 Days', price: '$ 850 pp', title: '3-Day Zanzibar Beach Getaway', description: 'Escape to paradise with this short but sweet Zanzibar beach holiday.', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD8TutGABrSl5RGgevcCh0_U9w9pZaUD0RAkLZZhhpTKx45qGoMDFkBusMgwskg0BF_K6weayLDSm4qa3IT5hF5UT0MFxHIt47TIw0iEu1SabgZMctE4M4GbE2YNP1HsiBshcPiRsl6tb9OTsHrEiB8sJ8YFRMBZhyRBQbyK87dKaNd_TjRQcdC_76CVF2QyK-cvyBL1IRCAqc1we0kpojENVyI5WZE8IIMYsg31NJMFHCUGQJQ56QnLGl-i86cf7hg04T8jmNPRfw' },
+      { days: '7 Days', price: '$ 2800 pp', title: '7-Day Classic Serengeti & Ngorongoro', description: 'Experience the heart of Tanzania\'s wildlife migration and the Ngorongoro Crater.', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD7BsfRKSmBseOjzE-JPqZoG6e7bsz_1PxXDG6SCKtdywqCOOoVKmlAWV_FL6WAc_vh8I5QgwCvK3U-24LRdQe0P8APOeahhlloh1Nz3DinKl3KXXeb4YxR2AjBI8bV1VVdVBWCj0mj5ZwcUDJafGQITUkPK6WfIH4MydORLhkc4XGYal9_HqJTZ5jGRZgzS2p96Dqwd2W7Wmuh1j23FquPl8mCdyqayE2D98SrSnBsz1AjpvHWZiv429KJ4blGDd8hJJv2m7o94OM' },
+      { days: '4 Days', price: '$ 750 pp', title: 'Budget 4-Day Tarangire & Lake Manyara', description: 'An affordable way to experience Tanzania\'s wildlife wonders.', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDLz1BFOeQZO1fwu26563aRKQFu2E7_4M7-bbRbTQVtQoKk67kw1OeyL2HVSSRMX3Lx2GsVKABmkCUMkQadQ88gRLWTywlJCAthbPPhb7e4sE5lG1vv6-ql3WH34RpvAgZ6mDxkrkZf5fmHPmqGU7Amx2TiCeYkq0jORVFsRi4AvhkTXst_fiJdVvy8CoMYkiE34kMuTEvUrvnm09TogdaItyVbMaVV9X4fr8tZ-eDeD-aWo3aioUSvCjjUsplTk83LGV5U7COi2fA' },
+      { days: '8 Days', price: '$ 3200 pp', title: '8-Day Southern Circuit Adventure', description: 'Explore the remote and wild parks of southern Tanzania, including Ruaha and Nyerere National Park.', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA6HBWD0eCNP8hnRFhLXpq6B60mVmTVUQldui5-pBEtmqFtXPQsySWWoXlOnzczfj8Dtee4rHSQikZN6tmGFsez9tQCDlAen4yom34WdeIE2ZmNqvKLN71UNJTHxpBk9QcQVQ7pBwdPLPMRhy7koH9gwev2kxRu7XvBAw4ksEuX7HYjaMYQD75SC3Ymcg6QkYKCRzxiTHqi4L9-c7vT5dPLqH1_CLtRTWZNQl5hg1Z29NqzrwtgCizIfmq70RMqAyhdJmsaaqoLXa8' },
+      { days: '5 Days', price: '$ 2500 pp', title: '5-Day Gombe Chimpanzee Trekking', description: 'Follow in the footsteps of Jane Goodall to see the chimpanzees of Gombe Stream National Park.', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBr-aeCOuWWe3IhxIbyjqNxEbBIHmYbIH8fgwQST6pjS66v2NQ70RkPkc-1-6ODeIAer8dPBVKEQebhh6PjLVMd-8hHPzWbrFC5gFe3yzO0koBPTx6H_B4JcLnvoCtaenu0FRhzaXjNTw8qgFLy9Zaci1iEEfheHAtFM_i6FXhIrdPPuTyrc2HBCRXBlaaITGA2glSEcbKjKW4p8z5Jef6jpW34EQiA2QPCJb3jzNWQl4JlZgdpd8S1DX0AtWEnyf3PrVQ_9Huy2D8' }
+    ];
+    
+    const popularPackageData = [
+      { title: 'The Great Migration', duration: '10 Days', price: 'From 11,250,000 TZS', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDibbY7gNdf1DTaSenEEzACKIjmcVnsgmlmvqMFGkeHy2w31plczlJb_NpBmSfrtGbYJ7jPSuusRX_1ewxTAuauMhAW06nTIgtAXYxH0iEk82Iv5jtWW-rtLFgMlPDG7qIDAR87ysVntGXi0JUMBBTzf2klplqh66hI6jqOEmm4zePIn85NDR2sPjDYMVss9sD0t3M3rkw5zdCWPDkb_zdvChuwvD7G1Z5InHoeWNABfCQqzJL4bHkMHa-_Xsfg6J8KlXAPwyxEkDU'},
+      { title: 'Gorilla Trekking Adventure', duration: '7 Days', price: 'From 15,000,000 TZS', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAX5glFPTeBOIlTPX0HmcDRpL_4r6n66N6EpnWxZZVrusPwVzPZDAk124boxhn0QAEoNSO14IasMJvvkkKBll_nYiGAeGb65l665IdgOZGvnUuSOxpTsmc-Ts2UD-CIky0WERPmtAtFn4LJNFs8Spl2hAVa0TyBOJWMYlkqaJTbpA1ar1omoOkejPaujPBqipydG-NqVYwlbw_uS31j1fXxfUj7q6ZSkQd8mGU_DLBwYs_Ol_-B_Xf5sa6CDjgUsBkTI6GQv8-960E'},
+      { title: 'Luxury Kruger Park Safari', duration: '8 Days', price: 'From 13,000,000 TZS', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBndYFgWbKeMjv_B_KZvoMvIpH4BEbUd8pu0MEF0geLfeQChROf4M--YS_TRYrLt8e7Q3UfinKP6GRq6ZjsOICtBVNka5YoEpz2PgwhGWUQVI3FW-B3DUL3ddkrhfRReJ1YwOII210xueGKtQyPcMVXiEJuWuiCqH4XCkLYVTYM1buuD9V3j2xzhrpbzjfCnJgWtMS9aqhyEDrxJ7ZFA5BbRvNFozRevzM6jdbAsmcjE2Fi_Ym9bHIehvtISVPnKGy0SzADjMbmVFc'},
+    ];
+    
+    const wildlifeData = [
+      { name: 'Elephant', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCjPYfW50eYZEf8glVCvGOHtuCu8CLQEMZLpe4y56gxkh6pAin3Xu7X94BEppDXPomX0Y-w28xeA3DpGiMpeCXs6yqhGThExMV8ujjEI7j8BytG_jd5dAlIHe1f-RsyCj8gYj3Bhk87MwTlmGlx4Na8gEIm_t7BcaT6Na1d1hWg10f3yL5BBaIzj-LNBpER68p2TT0BHTYgv6xWODsLHBBhNG4BCaiXvWtHEC_Qv7ntpjuCpkBu7gslyQQR63hNFZgKc-UgqGjXJ0o' },
+      { name: 'Leopard', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBndYFgWbKeMjv_B_KZvoMvIpH4BEbUd8pu0MEF0geLfeQChROf4M--YS_TRYrLt8e7Q3UfinKP6GRq6ZjsOICtBVNka5YoEpz2PgwhGWUQVI3FW-B3DUL3ddkrhfRReJ1YwOII210xueGKtQyPcMVXiEJuWuiCqH4XCkLYVTYM1buuD9V3j2xzhrpbzjfCnJgWtMS9aqhyEDrxJ7ZFA5BbRvNFozRevzM6jdbAsmcjE2Fi_Ym9bHIehvtISVPnKGy0SzADjMbmVFc' },
+      { name: 'Lion', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBxwEeZSEjpxLAHAdJCd-kN5kls5b6DeUFH7KqqZwWW222298GVv72NDAJvO6G-r9AbTJObpDzRbBnYBMDSzUJCO9CMdU7q6j6wu52BsQAR3zR7Z5d0jNjuLqicVrSkY7fC4y1Mqc7Lz-1ToHadazxK9eHgkHfDoc_6aroaL_ziEOShpaRYVCT_dQauTzmUqF83xiRa1yk2O-bPL3n7YSCXrTLe5vUXP1Oce2F1qOBeFexOxMa0g6qrdSWeSUuZvYZsZwCHWIHWmkw' },
+      { name: 'Wildebeest', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDibbY7gNdf1DTaSenEEzACKIjmcVnsgmlmvqMFGkeHy2w31plczlJb_NpBmSfrtGbYJ7jPSuusRX_1ewxTAuauMhAW06nTIgtAXYxH0iEk82Iv5jtWW-rtLFgMlPDG7qIDAR87ysVntGXi0JUMBBTzf2klplqh66hI6jqOEmm4zePIn85NDR2sPjDYMVss9sD0t3M3rkw5zdCWPDkb_zdvChuwvD7G1Z5InHoeWNABfCQqzJL4bHkMHa-_Xsfg6J8KlXAPwyxEkDU' },
+      { name: 'Gorilla', imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAX5glFPTeBOIlTPX0HmcDRpL_4r6n66N6EpnWxZZVrusPwVzPZDAk124boxhn0QAEoNSO14IasMJvvkkKBll_nYiGAeGb65l665IdgOZGvnUuSOxpTsmc-Ts2UD-CIky0WERPmtAtFn4LJNFs8Spl2hAVa0TyBOJWMYlkqaJTbpA1ar1omoOkejPaujPBqipydG-NqVYwlbw_uS31j1fXxfUj7q6ZSkQd8mGU_DLBwYs_Ol_-B_Xf5sa6CDjgUsBkTI6GQv8-960E' }
+    ];
+
+    const testimonialsData = [
+      {
+        text: "An absolutely life-changing experience. The attention to detail and knowledge of our guide was second to none. We saw the Big Five and so much more!",
+        author: "Jessica Miller",
+        imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuBLBPO1xb__Ox1fut0f51-21dB1VggrBxiUcIhgywAEY0L9vwhEKw7QebAd-Ij0fVQEENiV4JA6u_pPHLjRGUcCnWRFV-QU2-HF9p-lhyn5Kv_toZ9E7Le7loNTHy2Q9qGuGiRlwnqAyR3ZFlzhfdahtTpapr1FOus49_oADTzN_HV9fsgVYfmMyhp-xQMJeMZyg0MvOmpV-xPYOtSVurjGbAkiIvzPuhWfxJ5_ApYco1Xuhlh-0FKBub7Nv5uebeyB73CJxZmJDfk"
+      },
+      {
+        text: "The gorilla trekking was surreal. Asili Explorer Safaris handled everything perfectly, making it a safe and unforgettable journey.",
+        author: "David Chen",
+        imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuAnNqcT1FWQA6NFZIOk037sHdeNrxzmNzGyegmSDHAZ4xRfDPyNaBJTPKcYk7RgTPXG9yB296HtujzKYJxiEmLnFGj_bU9DntRKYU1bGW9llsVN7AQK8BcPBa7553ETExVyXzVIEVdp5en1E45NgbYmC5ZdjHugwC-9cqTnWEal3cx1V4XWC0nZVc0eXlFaz1YC8HZeAYqsVT2ckevlrNes5n1t39c2Kn7UjalMOU87KYivNcwrndeqUoXFVmW02tX1snmHFi8QMT0"
+      },
+      {
+        text: "Our family safari in the Serengeti exceeded all expectations. The kids are still talking about the lions we saw up close. Highly recommended!",
+        author: "The Williams Family",
+        imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuBndXLBFDPEqXpYwyoJeK8xg5JuSyzk9nkwrf9Me377HNCt7zjO5WWuMynX9Yc1o3CJ3d_tgcJGfo0PoMSSWrC3nrRmw6fwa1qEHpChcLqrOANDb8Jcj7qftL90k05mdX0l5Xv3i3BhgsRKt2WKgd-2VNKh7iDfRIkCvMfIL04JQ121A8bi3rMjzkhlR_qm2oqwI4sjJCXM9tvz48i3Pm7CffCEgFUy3eiIiJDoRQdJU80PLWX2P7ChAaDb8qFiC5JjZr_pIAQ55Xg"
+      },
+      {
+        text: "From the custom itinerary to the seamless logistics, everything was top-notch. A truly professional and passionate team.",
+        author: "Maria Garcia",
+        imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuA8mEUIEw4JJec1ZTHYT6RbOBaOvR8XKXyhxgbc9D9NPN6bUk588-8odIZp-sCeomrujZD3jQbblJGH7Xime1U5i35FluK2MugpSBLu4NZpGF65z9PFobiznm6VbnjHyA_1s7NOy_7fSp-T8ZxWJvLSCEIbtjgVNaV-NTQ3PC6PtiessjngMvZ9LG1hzIMSn1V_NMy9nxPBEF-IAfEDpK_GobX7L2U-VVb_Kc8C2SlKa_SB_O2yp2Gagt4vW7eWrbDMsm5V8EMKWNs"
+      },
+      {
+        text: "The booking process via WhatsApp was so easy and convenient. The team answered all our questions promptly. Amazing service!",
+        author: "Tomoko Sato",
+        imageUrl: "https://lh3.googleusercontent.com/aida-public/AB6AXuDv0rjD2b9VAL6Yq8NdKnp5_Iw7qdCBuHQhv64dDAxHwAvXksG_pydRlfEZ3-GZaI34InBQI2AodZMAB0f7uPKAOc95fjaJwWz-cQKPJ1QXEz1cVC0uVMxgLSQ5OQg9FgdEyRWsh1Uz5dx3uJ1Zy4szys6qBYcN7vjUJLd4k7XM28VXZUunVVMi-KijGx2avMUKb1pA-NbUYDNp-2RmQn0HAo2kxLiH_u_CYOczKwWNHMsPcJamcShXGrv9vX7TZCCVoTcyaz-kpiw"
+      }
+    ];
+
+    // --- Components ---
+
+    const AppHeader = () => (
+      <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-white/10 dark:border-b-[#393028] px-4 sm:px-6 lg:px-10 py-3 sticky top-5 bg-background-dark/80 backdrop-blur-sm z-50 rounded-xl">
+        <div className="flex items-center gap-2 text-white">
+          <img alt="ASILI EXPLORER SAFARIS logo" className="h-10 w-auto" src="./logo.png" />
+          <h2 className="text-white text-base font-bold leading-tight tracking-[-0.015em] sm:text-lg">ASILI EXPLORER SAFARIS</h2>
+        </div>
+        <nav className="hidden md:flex flex-1 justify-end gap-8">
+          <div className="flex items-center gap-9">
+            <a className="text-white/80 hover:text-white text-sm font-medium leading-normal" href="#parks">Explore Parks</a>
+            <a className="text-white/80 hover:text-white text-sm font-medium leading-normal" href="#packages">Packages</a>
+            <a className="text-white/80 hover:text-white text-sm font-medium leading-normal" href="#contact">Contact Us</a>
+          </div>
+          <a className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-primary hover:bg-primary/90 text-background-dark text-sm font-bold leading-normal tracking-[0.015em]" href="https://wa.me/255767140150" rel="noopener noreferrer" target="_blank">
+            <span className="truncate">Book Now</span>
+          </a>
+        </nav>
+        <div className="md:hidden">
+          <button className="text-white p-2">
+            <span className="material-symbols-outlined">menu</span>
+          </button>
+        </div>
+      </header>
+    );
+
+    const Hero = () => (
+      <div className="@container mt-5">
+        <div className="@[480px]:p-4">
+          <div className="flex min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-xl items-center justify-center p-4 text-center" style={{ backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuCjPYfW50eYZEf8glVCvGOHtuCu8CLQEMZLpe4y56gxkh6pAin3Xu7X94BEppDXPomX0Y-w28xeA3DpGiMpeCXs6yqhGThExMV8ujjEI7j8BytG_jd5dAlIHe1f-RsyCj8gYj3Bhk87MwTlmGlx4Na8gEIm_t7BcaT6Na1d1hWg10f3yL5BBaIzj-LNBpER68p2TT0BHTYgv6xWODsLHBBhNG4BCaiXvWtHEC_Qv7ntpjuCpkBu7gslyQQR63hNFZgKc-UgqGjXJ0o")` }}>
+            <div className="flex flex-col gap-2 max-w-2xl">
+              <h1 className="text-white text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]">Experience the Wild, Unforgettable Africa</h1>
+              <h2 className="text-white/90 text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal">Embark on an authentic safari adventure with our expert guides.</h2>
+            </div>
+            <a className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-6 bg-primary hover:bg-primary/90 text-background-dark text-base font-bold leading-normal tracking-[0.015em] mt-4" href="https://wa.me/255767140150" rel="noopener noreferrer" target="_blank">
+              <span className="truncate">Inquire Now</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+    
+    const ParkCard = ({ name, imageUrl }) => (
+      <a className="group relative block overflow-hidden rounded-xl w-64" href="#">
+        <div className="w-full h-80 bg-center bg-cover transition-transform duration-300 group-hover:scale-105" style={{ backgroundImage: `url("${imageUrl}")` }}></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 p-4">
+          <h3 className="text-white text-lg font-bold">{name}</h3>
+        </div>
+      </a>
+    );
+
+    const ParksSection = () => (
+      <section id="parks">
+        <h2 className="text-white text-center text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Explore Our Parks</h2>
+        <div className="flex overflow-x-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden p-4 gap-4">
+          <div className="grid grid-flow-col auto-cols-max gap-4">
+            {parkData.map(park => <ParkCard key={park.name} {...park} />)}
+          </div>
+        </div>
+      </section>
+    );
+
+    const PackageCard = ({ days, price, title, description, imageUrl, className = "" }) => (
+      <div className={`group relative flex flex-col rounded-xl overflow-hidden bg-[#27211c] ${className}`}>
+        <div className="relative">
+          <img alt={title} className="w-full h-56 object-cover" src={imageUrl} />
+          <div className="absolute top-3 left-3 bg-black/50 text-white text-xs font-bold py-1 px-3 rounded-full">{days}</div>
+          <div className="absolute top-3 right-3 bg-black/50 text-white text-xs font-bold py-1 px-3 rounded-full">{price}</div>
+        </div>
+        <div className="p-5 flex flex-col flex-1">
+          <h3 className="text-white text-lg font-bold">{title}</h3>
+          <p className="text-[#b9ab9d] text-sm mt-2 flex-1">{description}</p>
+        </div>
+      </div>
+    );
+
+    const PackagesSection = () => (
+      <section id="packages">
+        <div className="flex flex-col items-center text-center p-4">
+          <h2 className="text-white text-3xl font-bold tracking-tight">YOUR GUIDE TO TANZANIA'S WONDERS</h2>
+          <p className="text-primary mt-2 text-sm font-bold tracking-widest uppercase">YOUR DREAM TRIP, OUR EXPERTISE</p>
+          <div className="w-16 h-1 bg-primary mt-4 rounded-full"></div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
+          {packageData.map((pkg, index) => {
+            let colSpan = "";
+            if (index === 6) colSpan = "md:col-span-2 lg:col-span-1";
+            if (index === 7) colSpan = "lg:col-start-2";
+            return <PackageCard key={pkg.title} {...pkg} className={colSpan} />;
+          })}
+        </div>
+      </section>
+    );
+    
+    const PopularPackageCard = ({ title, duration, price, imageUrl }) => (
+      <div className="flex flex-col rounded-xl bg-[#27211c] shadow-[0_0_4px_rgba(0,0,0,0.1)] overflow-hidden">
+        <div className="w-full bg-center bg-no-repeat aspect-video bg-cover" style={{ backgroundImage: `url("${imageUrl}")` }}></div>
+        <div className="flex flex-col flex-1 justify-between p-4 gap-4">
+          <div>
+            <p className="text-white text-base font-medium leading-normal">{title}</p>
+            <p className="text-[#b9ab9d] text-sm font-normal leading-normal">{duration} - {price}</p>
+          </div>
+          <a className="flex w-full min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary hover:bg-primary/90 text-background-dark text-sm font-bold leading-normal tracking-[0.015em]" href="https://wa.me/255767140150" rel="noopener noreferrer" target="_blank">
+            <span className="truncate">Book Now</span>
+          </a>
+        </div>
+      </div>
+    );
+    
+    const PopularPackagesSection = () => (
+      <section>
+        <h2 className="text-white text-center text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Popular Safari Packages</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+            {popularPackageData.map(pkg => <PopularPackageCard key={pkg.title} {...pkg} />)}
+        </div>
+      </section>
+    );
+
+    const WildlifeSection = () => (
+      <section id="wildlife">
+        <h2 className="text-white text-center text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Our Wildlife</h2>
+        <div className="flex overflow-x-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex items-stretch p-4 gap-4 w-max">
+            {wildlifeData.map(animal => (
+              <div key={animal.name} className="flex flex-col w-48 text-center items-center gap-2">
+                <img alt={animal.name} className="w-32 h-32 rounded-full object-cover border-2 border-primary/50" src={animal.imageUrl} />
+                <h3 className="text-white font-semibold">{animal.name}</h3>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+
+    const FeaturesSection = () => (
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-8 p-4">
+        <div className="flex flex-col items-center text-center gap-2">
+          <div className="w-12 h-12 flex items-center justify-center bg-primary/20 rounded-full mb-2">
+            <span className="material-symbols-outlined text-primary text-3xl">verified_user</span>
+          </div>
+          <h3 className="text-white text-lg font-bold">Expert Guides</h3>
+          <p className="text-[#b9ab9d] text-sm">Our local guides are passionate experts who bring the safari to life.</p>
+        </div>
+        <div className="flex flex-col items-center text-center gap-2">
+          <div className="w-12 h-12 flex items-center justify-center bg-primary/20 rounded-full mb-2">
+            <span className="material-symbols-outlined text-primary text-3xl">eco</span>
+          </div>
+          <h3 className="text-white text-lg font-bold">Sustainable Tourism</h3>
+          <p className="text-[#b9ab9d] text-sm">We are committed to conservation and supporting local communities.</p>
+        </div>
+        <div className="flex flex-col items-center text-center gap-2">
+          <div className="w-12 h-12 flex items-center justify-center bg-primary/20 rounded-full mb-2">
+            <span className="material-symbols-outlined text-primary text-3xl">edit_calendar</span>
+          </div>
+          <h3 className="text-white text-lg font-bold">Custom Itineraries</h3>
+          <p className="text-[#b9ab9d] text-sm">We tailor every trip to your interests, budget, and style.</p>
+        </div>
+      </section>
+    );
+
+    const TestimonialSlide = ({ text, author, imageUrl }) => (
+      <div className="w-full flex-shrink-0">
+        <div className="bg-[#27211c] p-8 rounded-xl text-center flex flex-col items-center max-w-2xl mx-auto">
+          <img alt={`Portrait of ${author}`} className="w-20 h-20 rounded-full object-cover mb-4 border-2 border-primary" src={imageUrl} />
+          <div className="flex mb-2 text-primary">
+            {[...Array(5)].map((_, i) => <span key={i} className="material-symbols-outlined !text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>)}
+          </div>
+          <blockquote className="text-white italic text-lg mb-4">"{text}"</blockquote>
+          <cite className="text-[#b9ab9d] font-bold not-italic">{author}</cite>
+        </div>
+      </div>
+    );
+    
+    const TestimonialsSection = () => {
+      const [currentIndex, setCurrentIndex] = useState(0);
+
+      const nextSlide = () => setCurrentIndex(prev => (prev + 1) % testimonialsData.length);
+      const prevSlide = () => setCurrentIndex(prev => (prev - 1 + testimonialsData.length) % testimonialsData.length);
+      
+      return (
+        <section>
+          <div className="flex justify-between items-center px-4 pt-2">
+            <h4 className="text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">What Our Adventurers Say</h4>
+            <div className="flex gap-2">
+              <button onClick={prevSlide} className="w-8 h-8 flex items-center justify-center rounded-full bg-[#27211c] hover:bg-[#393028] text-white">
+                <span className="material-symbols-outlined">arrow_back</span>
+              </button>
+              <button onClick={nextSlide} className="w-8 h-8 flex items-center justify-center rounded-full bg-[#27211c] hover:bg-[#393028] text-white">
+                <span className="material-symbols-outlined">arrow_forward</span>
+              </button>
+            </div>
+          </div>
+          <div className="relative p-4 overflow-hidden">
+            <div className="flex transition-transform duration-300 ease-in-out" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
+              {testimonialsData.map((testimonial, index) => <TestimonialSlide key={index} {...testimonial} />)}
+            </div>
+          </div>
+        </section>
+      );
+    };
+
+    const CTASection = () => (
+      <section className="bg-[#27211c] p-8 rounded-xl flex flex-col items-center justify-center gap-6 text-center" id="contact">
+        <h3 className="text-white text-2xl font-bold">Ready for Your Adventure?</h3>
+        <p className="text-[#b9ab9d] text-base max-w-lg">Contact us on WhatsApp for questions, custom itineraries, and direct bookings. Our experts are ready to help you plan the trip of a lifetime!</p>
+        <a className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-6 bg-primary hover:bg-primary/90 text-background-dark text-base font-bold leading-normal tracking-[0.015em] mt-2 gap-2" href="https://wa.me/255767140150" rel="noopener noreferrer" target="_blank">
+          <svg fill="currentColor" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 4.315 1.731 6.086l.001.004 4.971 4.971zM9.266 8.39l.108-.003.002.004c.068.14.225.434.316.61.12.232.24.499.363.757.132.282.239.511.239.511l.002.004c.168.353.375.763.375.763l.003.004c.055.099.094.17.094.17l.002.004c-.033.065-.054.113-.054.113l-.001.002c-.316.51-.624.95-.828 1.118-.189.155-.357.27-.401.291-.097.045-.224.117-.224.117l-.002.001c-.134.053-.274.053-.33.053-.054.002-.12-.012-.198-.05-.143-.071-.34-.143-.593-.25-.429-.187-.84-.42-1.222-.692-.482-.331-.94-1.015-1.125-1.223-.11-.122-.196-.254-.196-.254l-.002-.002c-.05-.084-.084-.158-.084-.158l-.001-.002c.001-.023.004-.055.004-.055l.001-.001c.012-.033.024-.064.038-.097.02-.045.045-.09.077-.145.045-.078.082-.133.082-.133l.002-.002c.05-.07.112-.16.208-.29.117-.156.223-.297.29-.364.062-.06.12-.125.12-.125l.003-.002z"></path></svg>
+          <span className="truncate">Chat on WhatsApp</span>
+        </a>
+      </section>
+    );
+
+    const AppFooter = () => (
+      <footer className="mt-20 border-t border-solid border-white/10 dark:border-t-[#393028] pt-10 pb-5">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-sm">
+          <div className="flex flex-col gap-4">
+            <h4 className="font-bold text-white">ASILI EXPLORER SAFARIS</h4>
+            <p className="text-[#b9ab9d]">Your gateway to the wild heart of Africa.</p>
+            <div className="flex gap-4 mt-2">
+              <a className="text-[#b9ab9d] hover:text-white" href="https://wa.me/255767140150" rel="noopener noreferrer" target="_blank"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 4.315 1.731 6.086l.001.004 4.971 4.971zM9.266 8.39l.108-.003.002.004c.068.14.225.434.316.61.12.232.24.499.363.757.132.282.239.511.239.511l.002.004c.168.353.375.763.375.763l.003.004c.055.099.094.17.094.17l.002.004c-.033.065-.054.113-.054.113l-.001.002c-.316.51-.624.95-.828 1.118-.189.155-.357.27-.401.291-.097.045-.224.117-.224.117l-.002.001c-.134.053-.274.053-.33.053-.054.002-.12-.012-.198-.05-.143-.071-.34-.143-.593-.25-.429-.187-.84-.42-1.222-.692-.482-.331-.94-1.015-1.125-1.223-.11-.122-.196-.254-.196-.254l-.002-.002c-.05-.084-.084-.158-.084-.158l-.001-.002c.001-.023.004-.055.004-.055l.001-.001c.012-.033.024-.064.038-.097.02-.045.045-.09.077-.145.045-.078.082-.133.082-.133l.002-.002c.05-.07.112-.16.208-.29.117-.156.223-.297.29-.364.062-.06.12-.125.12-.125l.003-.002z"></path></svg></a>
+              <a className="text-[#b9ab9d] hover:text-white" href="#" rel="noopener noreferrer" target="_blank"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z"></path></svg></a>
+              <a className="text-[#b9ab9d] hover:text-white" href="#" rel="noopener noreferrer" target="_blank"><svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8A3.6 3.6 0 0 0 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6A3.6 3.6 0 0 0 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z"></path></svg></a>
+            </div>
+          </div>
+          <div className="flex flex-col gap-3">
+            <h5 className="font-bold text-white mb-1">Quick Links</h5>
+            <a className="text-[#b9ab9d] hover:text-white" href="#parks">Explore Parks</a>
+            <a className="text-[#b9ab9d] hover:text-white" href="#packages">Packages</a>
+            <a className="text-[#b9ab9d] hover:text-white" href="#contact">Contact Us</a>
+          </div>
+          <div className="flex flex-col gap-3">
+            <h5 className="font-bold text-white mb-1">Support</h5>
+            <a className="text-[#b9ab9d] hover:text-white" href="#contact">Contact Us</a>
+          </div>
+          <div className="flex flex-col gap-3">
+            <h5 className="font-bold text-white mb-1">Contact</h5>
+            <p className="text-[#b9ab9d]">123 Adventure Lane, Arusha, Tanzania</p>
+            <p className="text-[#b9ab9d]">contact@safariadventures.com</p>
+            <a className="text-[#b9ab9d] hover:text-white" href="https://wa.me/255767140150" rel="noopener noreferrer" target="_blank">+255 767 140 150</a>
+          </div>
+        </div>
+        <div className="mt-10 pt-5 border-t border-solid border-white/10 dark:border-t-[#393028] text-center text-xs text-[#b9ab9d]">
+          <p>© 2024 ASILI EXPLORER SAFARIS. All Rights Reserved.</p>
+        </div>
+      </footer>
+    );
+
+    // --- Page ---
+    const HomePage = () => (
+      <div className="relative flex min-h-screen w-full flex-col group/design-root overflow-x-hidden">
+        <div className="layout-container flex h-full grow flex-col">
+          <div className="px-4 sm:px-8 md:px-16 lg:px-24 xl:px-40 flex flex-1 justify-center py-5">
+            <div className="layout-content-container flex flex-col w-full max-w-[960px] flex-1">
+              <AppHeader />
+              <main className="flex flex-col gap-12 sm:gap-16 md:gap-20">
+                <Hero />
+                <ParksSection />
+                <PackagesSection />
+                <PopularPackagesSection />
+                <WildlifeSection />
+                <FeaturesSection />
+                <TestimonialsSection />
+                <CTASection />
+              </main>
+              <AppFooter />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+
+    // --- App ---
+    const App = () => {
+      return (
+        <MemoryRouter>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+          </Routes>
+        </MemoryRouter>
+      );
+    };
+
+    const container = document.getElementById('root');
+    const root = createRoot(container);
+    root.render(<App />);
+  </script>
+</body>
+</html>
